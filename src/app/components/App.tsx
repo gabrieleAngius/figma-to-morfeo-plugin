@@ -1,47 +1,41 @@
-import React from 'react';
-import logo from '../assets/logo.svg';
+import * as React from 'react';
+import { useDownload } from '../hooks/useDownload';
 import '../styles/ui.css';
+import { ActionTypes } from '../../_shared/types/actions';
 
-function App() {
-  const textbox = React.useRef<HTMLInputElement>(undefined);
+declare function require(_: string): any;
 
-  const countRef = React.useCallback((element: HTMLInputElement) => {
-    if (element) element.value = '5';
-    textbox.current = element;
-  }, []);
-
-  const onCreate = () => {
-    const count = parseInt(textbox.current.value, 10);
-    parent.postMessage({ pluginMessage: { type: 'create-rectangles', count } }, '*');
+const App = ({}) => {
+  const onGenerate = () => {
+    parent.postMessage({ pluginMessage: { type: ActionTypes.generateTheme } }, '*');
   };
 
   const onCancel = () => {
-    parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*');
+    parent.postMessage({ pluginMessage: { type: ActionTypes.closePlugin } }, '*');
   };
 
+  const { Download, downloadFile } = useDownload();
+
   React.useEffect(() => {
-    // This is how we read messages sent from the plugin controller
     window.onmessage = (event) => {
-      const { type, message } = event.data.pluginMessage;
-      if (type === 'create-rectangles') {
-        console.log(`Figma Says: ${message}`);
+      const { type, meta } = event.data.pluginMessage;
+      if (type === ActionTypes.downloadFile) {
+        downloadFile(new File([JSON.stringify(meta, null, 2)], 'theme.json'));
       }
     };
   }, []);
 
   return (
     <div>
-      <img src={logo} />
-      <h2>Rectangle Creator</h2>
-      <p>
-        Count: <input ref={countRef} />
-      </p>
-      <button id="create" onClick={onCreate}>
-        Create
+      <img src={require('../assets/logo.svg')} />
+      <h2>Morfeo Plugin</h2>
+      <button id="generate" onClick={onGenerate}>
+        Generate theme
       </button>
+      <Download />
       <button onClick={onCancel}>Cancel</button>
     </div>
   );
-}
+};
 
 export default App;

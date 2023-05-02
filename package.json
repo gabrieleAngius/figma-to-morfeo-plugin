@@ -1,7 +1,7 @@
 {
-  "name": "figma-plugin-react-template",
+  "name": "figma-to-morfeo",
   "version": "1.0.0",
-  "description": "This plugin template uses Typescript. If you are familiar with Javascript, Typescript will look very familiar. In fact, valid Javascript code is already valid Typescript code.",
+  "description": "This plugin allow to get and download a Morfeo theme, simply pressing a button",
   "license": "ISC",
   "scripts": {
     "build": "webpack --mode=production",
@@ -39,5 +39,11 @@
       "prettier --write",
       "git add"
     ]
-  }
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "author": "gabrieleAngius <gabriele.angius@omaha-project.com>"
 }
