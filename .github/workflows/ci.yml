@@ -5,10 +5,23 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  ci:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Check out code
+        uses: actions/checkout@v3
+
       - uses: actions/setup-node@v3
-      - run: yarn
-      - run: yarn build
+
+      - name: install packages
+        run: yarn
+
+      - name: compile
+        run: yarn compile
+
+      - name: test
+        run: yarn test
+
+      - name: build
+        run: yarn build
