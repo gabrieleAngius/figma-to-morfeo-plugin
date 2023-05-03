@@ -1,7 +1,7 @@
-import { resolvers } from './resolvers';
+import { controllers } from './pluginControllers';
 
 figma.showUI(__html__);
 
 figma.ui.onmessage = (msg) => {
-  resolvers[msg.type](msg);
+  controllers[msg.type](msg);
 };

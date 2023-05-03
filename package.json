@@ -7,7 +7,8 @@
     "build": "webpack --mode=production",
     "build:watch": "webpack --mode=development --watch",
     "prettier:format": "prettier --write '**/*.{js,jsx,ts,tsx,css,json}' ",
-    "test": "jest"
+    "test": "jest",
+    "compile": "tsc"
   },
   "dependencies": {
     "jest": "^29.5.0",
