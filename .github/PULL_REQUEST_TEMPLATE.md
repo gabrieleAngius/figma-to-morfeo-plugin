@@ -18,7 +18,7 @@
 
 > _Put an `x` in the boxes that apply. You can also fill these out after creating the PR. This is simply a reminder of what we are going to look for before merging your code._
 
-- [ ] :scissors: I have ensured that the MR is concise and broken down if needed
+- [ ] :scissors: I have ensured that the PR is concise and broken down if needed
 - [ ] 👀 I have read the [README](../README.md) doc
 - [ ] 🧪 I have added tests that prove my fix is effective or that my feature works
 - [ ] 📚 I have added necessary documentation (if appropriate)
