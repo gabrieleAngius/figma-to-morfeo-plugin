@@ -1,8 +1,10 @@
 import { recursiveMixColors, toRgbaString } from './mixColors';
+import { parseName } from './parseName';
 
 export const colorNormalizer = (figmaPaintStyles: PaintStyle[]) => {
   return figmaPaintStyles.reduce<Record<string, string>>((acc, current) => {
-    const newPaint = paintNormalizer(current.paints, current.name);
+    const parsedName = parseName(current.name);
+    const newPaint = paintNormalizer(current.paints, parsedName);
     if (newPaint) {
       return { ...acc, ...newPaint };
     }
