@@ -6,24 +6,24 @@ describe('get variants', () => {
     const res = getVariantCombinations([
       { sliceName: Slices.Radius, variants: { S: 1, M: 2, L: 3 }, styleKey: 'cornerRadius' },
       { sliceName: Slices.BorderWidth, variants: { X: 1, Y: 2 }, styleKey: 'strokeWeight' },
-      { sliceName: 'Ciao' as Slices, variants: { A: 1, B: 2 }, styleKey: 'ciao' as any },
+      { sliceName: 'Spacing' as Slices, variants: { A: 1, B: 2 }, styleKey: 'space' as any },
     ]);
 
     expect(res).toEqual([
-      { name: 'Radius=S, Border width=X, Ciao=A', cornerRadius: 1, strokeWeight: 1, ciao: 1 },
-      { name: 'Radius=S, Border width=X, Ciao=B', cornerRadius: 1, strokeWeight: 1, ciao: 2 },
-      { name: 'Radius=S, Border width=Y, Ciao=A', cornerRadius: 1, strokeWeight: 2, ciao: 1 },
-      { name: 'Radius=S, Border width=Y, Ciao=B', cornerRadius: 1, strokeWeight: 2, ciao: 2 },
+      { name: 'Radius=S, Border width=X, Spacing=A', cornerRadius: 1, strokeWeight: 1, space: 1 },
+      { name: 'Radius=S, Border width=X, Spacing=B', cornerRadius: 1, strokeWeight: 1, space: 2 },
+      { name: 'Radius=S, Border width=Y, Spacing=A', cornerRadius: 1, strokeWeight: 2, space: 1 },
+      { name: 'Radius=S, Border width=Y, Spacing=B', cornerRadius: 1, strokeWeight: 2, space: 2 },
 
-      { name: 'Radius=M, Border width=X, Ciao=A', cornerRadius: 2, strokeWeight: 1, ciao: 1 },
-      { name: 'Radius=M, Border width=X, Ciao=B', cornerRadius: 2, strokeWeight: 1, ciao: 2 },
-      { name: 'Radius=M, Border width=Y, Ciao=A', cornerRadius: 2, strokeWeight: 2, ciao: 1 },
-      { name: 'Radius=M, Border width=Y, Ciao=B', cornerRadius: 2, strokeWeight: 2, ciao: 2 },
+      { name: 'Radius=M, Border width=X, Spacing=A', cornerRadius: 2, strokeWeight: 1, space: 1 },
+      { name: 'Radius=M, Border width=X, Spacing=B', cornerRadius: 2, strokeWeight: 1, space: 2 },
+      { name: 'Radius=M, Border width=Y, Spacing=A', cornerRadius: 2, strokeWeight: 2, space: 1 },
+      { name: 'Radius=M, Border width=Y, Spacing=B', cornerRadius: 2, strokeWeight: 2, space: 2 },
 
-      { name: 'Radius=L, Border width=X, Ciao=A', cornerRadius: 3, strokeWeight: 1, ciao: 1 },
-      { name: 'Radius=L, Border width=X, Ciao=B', cornerRadius: 3, strokeWeight: 1, ciao: 2 },
-      { name: 'Radius=L, Border width=Y, Ciao=A', cornerRadius: 3, strokeWeight: 2, ciao: 1 },
-      { name: 'Radius=L, Border width=Y, Ciao=B', cornerRadius: 3, strokeWeight: 2, ciao: 2 },
+      { name: 'Radius=L, Border width=X, Spacing=A', cornerRadius: 3, strokeWeight: 1, space: 1 },
+      { name: 'Radius=L, Border width=X, Spacing=B', cornerRadius: 3, strokeWeight: 1, space: 2 },
+      { name: 'Radius=L, Border width=Y, Spacing=A', cornerRadius: 3, strokeWeight: 2, space: 1 },
+      { name: 'Radius=L, Border width=Y, Spacing=B', cornerRadius: 3, strokeWeight: 2, space: 2 },
     ]);
   });
 
