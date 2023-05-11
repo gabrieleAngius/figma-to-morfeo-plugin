@@ -38,8 +38,8 @@ describe('resolvers', () => {
 
       expect(mockUiPostMessage).toBeCalledWith({
         meta: {
-          'Color 1': 'rgba(31,0,201,1)',
-          'Color 2': 'rgba(105,57,80,0.6)',
+          color1: 'rgba(31,0,201,1)',
+          color2: 'rgba(105,57,80,0.6)',
         },
         type: 'download-file',
       });
@@ -120,9 +120,9 @@ describe('resolvers', () => {
 
       expect(mockUiPostMessage).toBeCalledWith({
         meta: {
-          'Color 1': '#9d2d37', // this color is rgb(157, 45, 56) the color obtained with Figma' color picker is rgb(157, 45, 55)
-          'Color 2': '#884337', // this color is rgb(136, 67, 55) the color obtained with Figma' color picker is rgb(137, 68, 56)
-          'Color 3': '#407170', // this color is rgb(64, 113, 112) the color obtained with Figma' color picker is rgb(65, 114, 113)
+          color1: '#9d2d37', // this color is rgb(157, 45, 56) the color obtained with Figma' color picker is rgb(157, 45, 55)
+          color2: '#884337', // this color is rgb(136, 67, 55) the color obtained with Figma' color picker is rgb(137, 68, 56)
+          color3: '#407170', // this color is rgb(64, 113, 112) the color obtained with Figma' color picker is rgb(65, 114, 113)
         },
         type: 'download-file',
       });
