@@ -4,6 +4,7 @@
   "description": "This plugin allow to get and download a Morfeo theme, simply pressing a button",
   "license": "ISC",
   "scripts": {
+    "dev": "yarn build:watch",
     "build": "webpack --mode=production",
     "build:watch": "webpack --mode=development --watch",
     "prettier:format": "prettier --write '**/*.{js,jsx,ts,tsx,css,json}' ",

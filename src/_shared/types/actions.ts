@@ -3,6 +3,8 @@ export enum ActionTypes {
   generateTheme = 'generate-theme',
   closePlugin = 'close-plugin',
   downloadFile = 'download-file',
+  generateThemePage = 'generate-theme-page',
+  syncTheme = 'sync-theme',
 }
 
 /** Subset of ActionTypes which includes just what could be received and managed on plugin' controller */
