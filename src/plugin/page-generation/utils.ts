@@ -35,38 +35,30 @@ type Variant = {
 } & Record<keyof Pick<ComponentNode, 'cornerRadius' | 'strokeWeight'>, number>;
 
 export const getVariantCombinations = (slices: GetVariantsParams): Variant[] => {
-  const combinations: Variant[] = [];
-  const keys = Object.keys(slices[0].variants);
-  const values = Object.values(slices[0].variants);
+  const [first, ...rest] = slices;
 
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-    const value = values[i];
-    const obj = { name: `${slices[0].sliceName}=${key}` } as Variant;
-    obj[slices[0].styleKey] = value;
-    combinations.push(obj);
-  }
+  const combinations: Variant[] = Object.entries(first.variants).map(
+    ([variantName, value]) =>
+      ({
+        name: `${first.sliceName}=${variantName}`,
+        [first.styleKey]: value,
+      } as Variant)
+  );
 
-  for (let i = 1; i < slices.length; i++) {
-    const sliceName = slices[i].sliceName;
-    const variants = slices[i].variants;
-    const styleKey = slices[i].styleKey;
+  return rest.reduce((acc, { sliceName, variants, styleKey }) => {
     const newResult = [];
-    for (let j = 0; j < combinations.length; j++) {
-      const obj = combinations[j];
-      for (const key in variants) {
-        const newObj = { ...obj };
-        newObj.name = `${newObj.name}, ${sliceName}=${key}`;
-        newObj[styleKey] = variants[key];
+
+    for (const combination of acc) {
+      for (const [variantName, value] of Object.entries(variants)) {
+        const newObj = { ...combination };
+        newObj.name = `${newObj.name}, ${sliceName}=${variantName}`;
+        newObj[styleKey] = value;
         newResult.push(newObj);
       }
     }
 
-    combinations.length = 0;
-    combinations.push(...newResult);
-  }
-
-  return combinations;
+    return newResult;
+  }, combinations);
 };
 
 export const createInstances = (variants: Variant[]) => {
