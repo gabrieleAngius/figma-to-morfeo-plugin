@@ -53,10 +53,27 @@ module.exports.mockParentPostMessage = jest.fn((data) => {
     .filter(([eventName]) => eventName === 'message')
     .forEach(([, handler]) => handler(data.pluginMessage));
 });
+
+const nodeBase = {
+  id: `${Math.random()}`,
+  appendChild: jest.fn(),
+  resize: jest.fn(),
+  setSharedPluginData: jest.fn(),
+  getSharedPluginData: jest.fn(),
+};
+
 module.exports.mockGetNodeById = jest.fn();
 module.exports.mockScrollAndZoomIntoView = jest.fn();
 module.exports.mockCreateImage = jest.fn();
-module.exports.mockCreateComponent = jest.fn(() => ({ id: `${Math.random()}` }));
+module.exports.mockCreateComponent = jest.fn(() => nodeBase);
+module.exports.mockCreatePage = jest.fn(() => nodeBase);
+module.exports.mockCreateRectangle = jest.fn(() => nodeBase);
+module.exports.mockCreateFrame = jest.fn(() => nodeBase);
+module.exports.mockCreateLine = jest.fn(() => nodeBase);
+module.exports.mockCombineAsVariants = jest.fn(() => nodeBase);
+module.exports.mockClosePlugin = jest.fn();
+
+module.exports.mockRootChildren = [];
 
 module.exports.figma = {
   showUI: module.exports.mockShowUI,
@@ -80,6 +97,7 @@ module.exports.figma = {
   root: {
     setSharedPluginData: module.exports.mockRootSetSharedPluginData,
     getSharedPluginData: module.exports.mockRootGetSharedPluginData,
+    children: module.exports.mockRootChildren,
   },
   getLocalPaintStyles: module.exports.mockGetLocalPaintStyles,
   getLocalTextStyles: module.exports.mockGetLocalTextStyles,
@@ -92,6 +110,12 @@ module.exports.figma = {
   getNodeById: module.exports.mockGetNodeById,
   createImage: module.exports.mockCreateImage,
   createComponent: module.exports.mockCreateComponent,
+  createPage: module.exports.mockCreatePage,
+  createRectangle: module.exports.mockCreateRectangle,
+  createFrame: module.exports.mockCreateFrame,
+  createLine: module.exports.mockCreateLine,
+  combineAsVariants: module.exports.mockCombineAsVariants,
+  closePlugin: module.exports.mockClosePlugin,
 };
 
 parent.postMessage = module.exports.mockParentPostMessage;

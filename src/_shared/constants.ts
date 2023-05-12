@@ -1,4 +1,5 @@
 export const PLUGIN_DATA_NAMESPACE = 'figmaToMorfeo';
+export const THEME_PAGE_NAME = '#Morfeo theme';
 
 export enum PluginDataKeys {
   boxRefId = 'box-ref-id',

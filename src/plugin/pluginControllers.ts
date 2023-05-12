@@ -1,5 +1,5 @@
 import { PluginActionTypes, ActionTypes } from '../_shared/types/actions';
-import { PLUGIN_DATA_NAMESPACE, PluginDataKeys, SliceFrameNames, Slices } from '../_shared/constants';
+import { PLUGIN_DATA_NAMESPACE, PluginDataKeys, SliceFrameNames, Slices, THEME_PAGE_NAME } from '../_shared/constants';
 import { Resolver } from '../_shared/types/resolver';
 import { colorNormalizer } from '../_shared/utils/normalizers';
 import {
@@ -25,7 +25,15 @@ export const controllers: Record<PluginActionTypes, Resolver> = {
   },
 
   'sync-theme': () => {
-    const themePage = figma.root.children.find((node) => node.name === 'Theme');
+    const themePage = figma.root.children.find((node) => node.name === THEME_PAGE_NAME);
+    if (!themePage) {
+      figma.notify(
+        `Cannot find a '${THEME_PAGE_NAME}' page. Please use 'Create theme page' function of the plugin before sync`,
+        { error: true, timeout: 5000 }
+      );
+      return;
+    }
+
     const radiiFrame = themePage.findOne(
       (node) => node.name === SliceFrameNames.Radius && node.type === 'FRAME'
     ) as FrameNode;
@@ -73,8 +81,14 @@ export const controllers: Record<PluginActionTypes, Resolver> = {
   },
 
   'generate-theme-page': () => {
+    const themePage = figma.root.children.find((node) => node.name === THEME_PAGE_NAME);
+    if (themePage) {
+      figma.notify(`The '${THEME_PAGE_NAME}' page already exist`, { error: true, timeout: 5000 });
+      return;
+    }
+
     const page = figma.createPage();
-    page.name = 'Theme';
+    page.name = THEME_PAGE_NAME;
     figma.currentPage = page;
 
     const radiiSlices = createRadiiSlices({ S: 3, M: 6, L: 10 });
