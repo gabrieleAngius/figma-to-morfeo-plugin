@@ -1,4 +1,10 @@
-import { mockGetLocalPaintStyles, mockUiPostMessage } from '../../__mocks__/figmaMock';
+import {
+  mockGetLocalPaintStyles,
+  mockUiPostMessage,
+  mockNotify,
+  mockRootChildren,
+  mockCreatePage,
+} from '../../__mocks__/figmaMock';
 import { ActionTypes } from '../_shared/types/actions';
 import { controllers } from './pluginControllers';
 
@@ -7,7 +13,6 @@ describe('resolvers', () => {
     beforeEach(() => {
       jest.clearAllMocks();
     });
-
     it('should send an empty meta if there are no valid colors', () => {
       controllers['generate-theme']({ type: ActionTypes.generateTheme });
 
@@ -169,6 +174,33 @@ describe('resolvers', () => {
         meta: {},
         type: 'download-file',
       });
+    });
+  });
+
+  describe('generate-theme-page', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+    it('should not create the page if it already exist', () => {
+      mockRootChildren.push({ name: '#Morfeo theme' });
+
+      controllers['generate-theme-page']({ type: ActionTypes.generateThemePage });
+
+      expect(mockCreatePage).not.toBeCalled();
+      expect(mockNotify).toBeCalledTimes(1);
+      expect(mockNotify).toBeCalledWith(expect.any(String), expect.objectContaining({ error: true }));
+
+      // clean mockRootChildren so it will not affect any other test
+      mockRootChildren.length = 0;
+    });
+
+    it('should create the page if it does not exist', () => {
+      controllers['generate-theme-page']({ type: ActionTypes.generateThemePage });
+
+      expect(mockCreatePage).toBeCalledTimes(1);
+
+      expect(mockNotify).toBeCalledTimes(1);
+      expect(mockNotify).toBeCalledWith('Theme page created!');
     });
   });
 });

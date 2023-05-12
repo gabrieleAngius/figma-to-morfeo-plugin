@@ -10,6 +10,14 @@ const App = ({}) => {
     parent.postMessage({ pluginMessage: { type: ActionTypes.generateTheme } }, '*');
   };
 
+  const onGenerateThemePage = () => {
+    parent.postMessage({ pluginMessage: { type: ActionTypes.generateThemePage } }, '*');
+  };
+
+  const onSync = () => {
+    parent.postMessage({ pluginMessage: { type: ActionTypes.syncTheme } }, '*');
+  };
+
   const onCancel = () => {
     parent.postMessage({ pluginMessage: { type: ActionTypes.closePlugin } }, '*');
   };
@@ -31,6 +39,12 @@ const App = ({}) => {
       <h2>Morfeo Plugin</h2>
       <button id="generate" onClick={onGenerate}>
         Generate theme
+      </button>
+      <button id="generateThemePage" onClick={onGenerateThemePage}>
+        Generate theme page
+      </button>
+      <button id="sync" onClick={onSync}>
+        SYNC
       </button>
       <Download />
       <button onClick={onCancel}>Cancel</button>
