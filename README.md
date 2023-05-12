@@ -1,3 +1,7 @@
+# Figma to Morfeo
+
+[![codecov](https://codecov.io/gh/gabrieleAngius/figma-to-morfeo/branch/main/graph/badge.svg?token=VJMHSKVPCD)](https://codecov.io/gh/gabrieleAngius/figma-to-morfeo)
+
 ## Quickstart
 
 - Run `yarn` to install dependencies.
