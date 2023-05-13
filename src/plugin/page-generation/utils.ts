@@ -118,6 +118,21 @@ export const getNewFrame = (name: string, options?: GetNewFrameOptions) => {
   return frame;
 };
 
+export const updateVariantName = ({
+  instanceName,
+  newVariantName,
+  sliceName,
+}: {
+  instanceName: string;
+  newVariantName: string;
+  sliceName: Slices;
+}) => {
+  const regex = new RegExp(`${sliceName}=[^,]+`, 'i');
+  const newSlice = `${sliceName}=${newVariantName}`;
+  const updatedName = instanceName.slice().replace(regex, newSlice);
+  return updatedName;
+};
+
 /**
  * Assign to each slice the matching
  * ref ids using setSharedPluginData
@@ -150,15 +165,21 @@ export const syncRadiiVariants = (radiiFrame: FrameNode) => {
     if (radiiSlice.type !== 'RECTANGLE') {
       return;
     }
-
+    const cornerRadius = radiiSlice.cornerRadius;
     const refIds = radiiSlice.getSharedPluginData(PLUGIN_DATA_NAMESPACE, radiiSlice.id).split('/#/');
+
+    if (cornerRadius === figma.mixed) {
+      figma.notify('Mixed border radius is not allowed on Slices', { error: true });
+      return;
+    }
+
+    if (refIds[0] === '') {
+      newRadiusSlices[radiiSlice.name] = cornerRadius;
+      return;
+    }
+
     refIds.map((refId) => {
       const boxVariant = figma.getNodeById(refId);
-
-      if (radiiSlice.cornerRadius === figma.mixed) {
-        figma.notify('Mixed border radius is not allowed on Slices', { error: true });
-        return;
-      }
 
       if (!boxVariant && existentRadiusSlices[radiiSlice.name]) {
         figma.notify(`The ${radiiSlice.name} variant on Radii already exist, please use a unique name`, {
@@ -169,14 +190,18 @@ export const syncRadiiVariants = (radiiFrame: FrameNode) => {
       }
 
       if (!boxVariant) {
-        newRadiusSlices[radiiSlice.name] = radiiSlice.cornerRadius;
+        // if reach here means the box variant with this id: refId does not exist anymore (has been deleted)
         return;
       }
 
       if (boxVariant.type === 'COMPONENT') {
-        existentRadiusSlices[radiiSlice.name] = radiiSlice.cornerRadius;
+        existentRadiusSlices[radiiSlice.name] = cornerRadius;
         boxVariant.cornerRadius = radiiSlice.cornerRadius;
-        boxVariant.name = boxVariant.name.replace(/Radius=.*?,/, `${Slices.Radius}=${radiiSlice.name},`);
+        boxVariant.name = updateVariantName({
+          instanceName: boxVariant.name,
+          newVariantName: radiiSlice.name,
+          sliceName: Slices.Radius,
+        });
       }
     });
   });
@@ -224,10 +249,11 @@ export const syncBorderWidthVariants = (borderWidthsFrame: FrameNode) => {
       if (boxVariant.type === 'COMPONENT') {
         existentBorderWidthSlices[borderWidthSlice.name] = strokeWeight;
         boxVariant.strokeWeight = borderWidthSlice.strokeWeight;
-        boxVariant.name = boxVariant.name.replace(
-          /Border width=.*?,/,
-          `${Slices.BorderWidth}=${borderWidthSlice.name},`
-        );
+        boxVariant.name = updateVariantName({
+          instanceName: boxVariant.name,
+          newVariantName: borderWidthSlice.name,
+          sliceName: Slices.BorderWidth,
+        });
       }
     });
   });

@@ -1,5 +1,5 @@
 import { Slices } from '../../_shared/constants';
-import { createInstances, getVariantCombinations } from './utils';
+import { createInstances, getVariantCombinations, updateVariantName } from './utils';
 
 describe('get variants', () => {
   it('should return expected combinations', () => {
@@ -72,5 +72,23 @@ describe('createInstances', () => {
         Y: `${instances[2].id}/#/${instances[3].id}`,
       },
     });
+  });
+});
+
+describe('updateVariantName', () => {
+  it('should replace the variant name for the provided slice, without mutating the input', () => {
+    const oldName = `${Slices.Radius}=S, ${Slices.BorderWidth}=F`;
+    const newName = updateVariantName({ instanceName: oldName, sliceName: Slices.Radius, newVariantName: 'A' });
+    const newName2 = updateVariantName({
+      instanceName: oldName,
+      sliceName: Slices.BorderWidth,
+      newVariantName: 'none',
+    });
+
+    const expectedName = `${Slices.Radius}=A, ${Slices.BorderWidth}=F`;
+    const expectedName2 = `${Slices.Radius}=S, ${Slices.BorderWidth}=none`;
+
+    expect(newName).toBe(expectedName);
+    expect(newName2).toBe(expectedName2);
   });
 });

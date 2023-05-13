@@ -14,7 +14,7 @@ import {
 } from './page-generation/utils';
 
 export const controllers: Record<PluginActionTypes, Resolver> = {
-  'generate-theme': () => {
+  [ActionTypes.generateTheme]: () => {
     const localPaintStyles = figma.getLocalPaintStyles();
     const normalizedColors = colorNormalizer(localPaintStyles);
 
@@ -24,7 +24,7 @@ export const controllers: Record<PluginActionTypes, Resolver> = {
     });
   },
 
-  'sync-theme': () => {
+  [ActionTypes.syncTheme]: () => {
     const themePage = figma.root.children.find((node) => node.name === THEME_PAGE_NAME);
     if (!themePage) {
       figma.notify(
@@ -80,7 +80,7 @@ export const controllers: Record<PluginActionTypes, Resolver> = {
     figma.notify('Components updated!');
   },
 
-  'generate-theme-page': () => {
+  [ActionTypes.generateThemePage]: () => {
     const themePage = figma.root.children.find((node) => node.name === THEME_PAGE_NAME);
     if (themePage) {
       figma.notify(`The '${THEME_PAGE_NAME}' page already exist`, { error: true, timeout: 5000 });
