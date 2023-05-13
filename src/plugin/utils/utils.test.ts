@@ -1,7 +1,7 @@
-import { Slices } from '../../_shared/constants';
-import { createInstances, getVariantCombinations, updateVariantName } from './utils';
+import { PLUGIN_DATA_NAMESPACE, Slices } from '../../_shared/constants';
+import { createInstances, getVariantCombinations, setRefs, updateVariantName } from './utils';
 
-describe('get variants', () => {
+describe('get variant combinations', () => {
   it('should return expected combinations', () => {
     const res = getVariantCombinations([
       { sliceName: Slices.Radius, variants: { S: 1, M: 2, L: 3 }, styleKey: 'cornerRadius' },
@@ -90,5 +90,20 @@ describe('updateVariantName', () => {
 
     expect(newName).toBe(expectedName);
     expect(newName2).toBe(expectedName2);
+  });
+});
+
+describe('setRefs', () => {
+  it('should call setSharedPluginData on slices with expected params', () => {
+    const mockSetSharedPluginData = jest.fn();
+    const slices = [
+      { name: 'S', id: '123:11', setSharedPluginData: mockSetSharedPluginData },
+      { name: 'M', id: '333:11', setSharedPluginData: mockSetSharedPluginData },
+    ] as unknown as readonly SceneNode[];
+    const refIds: Record<string, string> = { S: '444:32/#/222:12' };
+    setRefs({ slices, refIds });
+
+    expect(mockSetSharedPluginData).toBeCalledTimes(1);
+    expect(mockSetSharedPluginData).toBeCalledWith(PLUGIN_DATA_NAMESPACE, '123:11', '444:32/#/222:12');
   });
 });
