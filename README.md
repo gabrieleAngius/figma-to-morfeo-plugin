@@ -37,8 +37,8 @@ The object specified as `pluginMessage` will be received to the [plugin controll
 So to add a new pluginController:
 
 - create a new [ActionType](./src/_shared/types/actions.ts)
-- add the code on [pluginController.ts](./src/plugin/pluginControllers.ts)
-- add the [test case](./src/plugin/pluginControllers.test.ts)
+- create a new folder inside `/plugin` with a file named in the same way (and one more test file)
+- add the new function on `controllers` map at [controller.ts](./src/plugin/controller.ts)
 
 ## Trigger a UI action from the plugin
 

@@ -3,7 +3,7 @@ export enum ActionTypes {
   generateTheme = 'generate-theme',
   closePlugin = 'close-plugin',
   downloadFile = 'download-file',
-  generateThemePage = 'generate-theme-page',
+  createMorfeoTheme = 'create-morfeo-theme',
   syncTheme = 'sync-theme',
 }
 

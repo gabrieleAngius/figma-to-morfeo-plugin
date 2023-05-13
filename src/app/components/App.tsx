@@ -10,8 +10,8 @@ const App = ({}) => {
     parent.postMessage({ pluginMessage: { type: ActionTypes.generateTheme } }, '*');
   };
 
-  const onGenerateThemePage = () => {
-    parent.postMessage({ pluginMessage: { type: ActionTypes.generateThemePage } }, '*');
+  const onCreateMorfeoTheme = () => {
+    parent.postMessage({ pluginMessage: { type: ActionTypes.createMorfeoTheme } }, '*');
   };
 
   const onSync = () => {
@@ -40,8 +40,8 @@ const App = ({}) => {
       <button id="generate" onClick={onGenerate}>
         Generate theme
       </button>
-      <button id="generateThemePage" onClick={onGenerateThemePage}>
-        Generate theme page
+      <button id="createMorfeoTheme" onClick={onCreateMorfeoTheme}>
+        Create Morfeo theme
       </button>
       <button id="sync" onClick={onSync}>
         SYNC
