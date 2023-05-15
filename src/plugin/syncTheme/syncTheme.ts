@@ -25,6 +25,25 @@ export const syncTheme: Controller = () => {
   const borderWidthsFrame = themePage.findOne(
     (node) => node.name === SliceFrameNames.BorderWidth && node.type === 'FRAME'
   ) as FrameNode;
+
+  if (!radiiFrame || !borderWidthsFrame) {
+    figma.notify('Cannot find all the slices. If you delete some of them, please undo that change', {
+      error: true,
+      timeout: 3000,
+    });
+    figma.closePlugin();
+    return;
+  }
+
+  if (radiiFrame.children.length === 0 || borderWidthsFrame.children.length === 0) {
+    figma.notify('Detected some empty slices. Please keep at least one variant for each slice', {
+      error: true,
+      timeout: 3000,
+    });
+    figma.closePlugin();
+    return;
+  }
+
   const boxComponentId = themePage.getSharedPluginData(PLUGIN_DATA_NAMESPACE, PluginDataKeys.boxRefId);
   const boxComponent = figma.getNodeById(boxComponentId);
 
@@ -35,20 +54,6 @@ export const syncTheme: Controller = () => {
 
   const { existentRadiusSlices, newRadiusSlices } = syncRadiiVariants(radiiFrame);
   const { existentBorderWidthSlices, newBorderWidthSlices } = syncBorderWidthVariants(borderWidthsFrame);
-
-  const existentRadiusSlicesKeys = Object.keys(existentRadiusSlices);
-  const updatedCurrentRadiusVariants = checkAndRemoveDeletedSlices({
-    themePage,
-    existentSlicesKeys: existentRadiusSlicesKeys,
-    pluginDataKey: PluginDataKeys.currentRadiiVariants,
-  });
-
-  const existentBorderWidthSlicesKeys = Object.keys(existentBorderWidthSlices);
-  const updatedCurrentBorderWidthVariants = checkAndRemoveDeletedSlices({
-    themePage,
-    existentSlicesKeys: existentBorderWidthSlicesKeys,
-    pluginDataKey: PluginDataKeys.currentBorderWidthVariants,
-  });
 
   const newRadiiCombinations = getVariantCombinations([
     { sliceName: Slices.Radius, styleKey: 'cornerRadius', variants: newRadiusSlices },
@@ -72,6 +77,20 @@ export const syncTheme: Controller = () => {
 
   // add the new variants to the Box component
   newBoxVariants.instances.map((newBoxVariant) => boxComponent.appendChild(newBoxVariant));
+
+  const existentRadiusSlicesKeys = Object.keys(existentRadiusSlices);
+  const updatedCurrentRadiusVariants = checkAndRemoveDeletedSlices({
+    themePage,
+    existentSlicesKeys: existentRadiusSlicesKeys,
+    pluginDataKey: PluginDataKeys.currentRadiiVariants,
+  });
+
+  const existentBorderWidthSlicesKeys = Object.keys(existentBorderWidthSlices);
+  const updatedCurrentBorderWidthVariants = checkAndRemoveDeletedSlices({
+    themePage,
+    existentSlicesKeys: existentBorderWidthSlicesKeys,
+    pluginDataKey: PluginDataKeys.currentBorderWidthVariants,
+  });
 
   setRefs({ refIds: newBoxVariants.refIds?.[Slices.Radius], slices: radiiFrame.children });
   setRefs({ refIds: newBoxVariants.refIds?.[Slices.BorderWidth], slices: borderWidthsFrame.children });
