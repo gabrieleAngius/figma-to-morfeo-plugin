@@ -6,8 +6,8 @@ import {
   Slices,
 } from '../../_shared/constants';
 import { Controller } from '../../_shared/types/contoller';
-import { getVariantCombinations, createInstances, setRefs } from '../utils/utils';
-import { syncBorderWidthVariants, syncRadiiVariants } from './utils';
+import { getVariantCombinations, createInstances, setRefs, saveCurrentBoxVariants } from '../utils/utils';
+import { checkAndRemoveDeletedSlices, syncBorderWidthVariants, syncRadiiVariants } from './utils';
 
 export const syncTheme: Controller = () => {
   const themePage = figma.root.children.find((node) => node.name === THEME_PAGE_NAME);
@@ -36,6 +36,20 @@ export const syncTheme: Controller = () => {
   const { existentRadiusSlices, newRadiusSlices } = syncRadiiVariants(radiiFrame);
   const { existentBorderWidthSlices, newBorderWidthSlices } = syncBorderWidthVariants(borderWidthsFrame);
 
+  const existentRadiusSlicesKeys = Object.keys(existentRadiusSlices);
+  const updatedCurrentRadiusVariants = checkAndRemoveDeletedSlices({
+    themePage,
+    existentSlicesKeys: existentRadiusSlicesKeys,
+    pluginDataKey: PluginDataKeys.currentRadiiVariants,
+  });
+
+  const existentBorderWidthSlicesKeys = Object.keys(existentBorderWidthSlices);
+  const updatedCurrentBorderWidthVariants = checkAndRemoveDeletedSlices({
+    themePage,
+    existentSlicesKeys: existentBorderWidthSlicesKeys,
+    pluginDataKey: PluginDataKeys.currentBorderWidthVariants,
+  });
+
   const newRadiiCombinations = getVariantCombinations([
     { sliceName: Slices.Radius, styleKey: 'cornerRadius', variants: newRadiusSlices },
     {
@@ -61,6 +75,16 @@ export const syncTheme: Controller = () => {
 
   setRefs({ refIds: newBoxVariants.refIds?.[Slices.Radius], slices: radiiFrame.children });
   setRefs({ refIds: newBoxVariants.refIds?.[Slices.BorderWidth], slices: borderWidthsFrame.children });
+  saveCurrentBoxVariants({
+    themePage,
+    refIds: { ...newBoxVariants.refIds?.[Slices.Radius], ...updatedCurrentRadiusVariants },
+    pluginKey: PluginDataKeys.currentRadiiVariants,
+  });
+  saveCurrentBoxVariants({
+    themePage,
+    refIds: { ...newBoxVariants.refIds?.[Slices.BorderWidth], ...updatedCurrentBorderWidthVariants },
+    pluginKey: PluginDataKeys.currentBorderWidthVariants,
+  });
 
   figma.notify('Components updated!');
 };

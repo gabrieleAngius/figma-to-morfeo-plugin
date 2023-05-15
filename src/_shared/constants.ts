@@ -3,6 +3,8 @@ export const THEME_PAGE_NAME = '#Morfeo theme';
 
 export enum PluginDataKeys {
   boxRefId = 'box-ref-id',
+  currentRadiiVariants = 'current-radii-variants',
+  currentBorderWidthVariants = 'current-border-width-variants',
 }
 
 export enum SliceFrameNames {

@@ -1,5 +1,5 @@
-import { PLUGIN_DATA_NAMESPACE, Slices } from '../../_shared/constants';
-import { updateVariantName } from '../utils/utils';
+import { PLUGIN_DATA_NAMESPACE, PluginDataKeys, Slices } from '../../_shared/constants';
+import { deleteNodesById, updateVariantName } from '../utils/utils';
 
 /**
  * Takes the radiiFrame as parameter and sync
@@ -28,21 +28,16 @@ export const syncRadiiVariants = (radiiFrame: FrameNode) => {
       return;
     }
 
+    if (existentRadiusSlices[radiiSlice.name]) {
+      figma.notify(`The ${radiiSlice.name} variant on Radii already exist, please use a unique name`, {
+        error: true,
+        timeout: 2000,
+      });
+      return;
+    }
+
     refIds.map((refId) => {
       const boxVariant = figma.getNodeById(refId);
-
-      if (!boxVariant && existentRadiusSlices[radiiSlice.name]) {
-        figma.notify(`The ${radiiSlice.name} variant on Radii already exist, please use a unique name`, {
-          error: true,
-          timeout: 2000,
-        });
-        return;
-      }
-
-      if (!boxVariant) {
-        // if reach here means the box variant with this id: refId does not exist anymore (has been deleted)
-        return;
-      }
 
       if (boxVariant.type === 'COMPONENT') {
         existentRadiusSlices[radiiSlice.name] = cornerRadius;
@@ -77,24 +72,25 @@ export const syncBorderWidthVariants = (borderWidthsFrame: FrameNode) => {
     if (borderWidthSlice.strokeWeight === figma.mixed) {
       return;
     }
-    const strokeWeight = borderWidthSlice.strokeWeight;
 
+    const strokeWeight = borderWidthSlice.strokeWeight;
     const refIds = borderWidthSlice.getSharedPluginData(PLUGIN_DATA_NAMESPACE, borderWidthSlice.id).split('/#/');
+
+    if (refIds[0] === '') {
+      newBorderWidthSlices[borderWidthSlice.name] = strokeWeight;
+      return;
+    }
+
+    if (existentBorderWidthSlices[borderWidthSlice.name]) {
+      figma.notify(`The ${borderWidthSlice.name} variant on Border widths already exist, please use a unique name`, {
+        error: true,
+        timeout: 2000,
+      });
+      return;
+    }
+
     refIds.map((refId) => {
       const boxVariant = figma.getNodeById(refId);
-
-      if (!boxVariant && existentBorderWidthSlices[borderWidthSlice.name]) {
-        figma.notify(`The ${borderWidthSlice.name} variant on Border widths already exist, please use a unique name`, {
-          error: true,
-          timeout: 2000,
-        });
-        return;
-      }
-
-      if (!boxVariant) {
-        newBorderWidthSlices[borderWidthSlice.name] = strokeWeight;
-        return;
-      }
 
       if (boxVariant.type === 'COMPONENT') {
         existentBorderWidthSlices[borderWidthSlice.name] = strokeWeight;
@@ -109,4 +105,40 @@ export const syncBorderWidthVariants = (borderWidthsFrame: FrameNode) => {
   });
 
   return { existentBorderWidthSlices, newBorderWidthSlices };
+};
+
+type CheckAndRemoveDeletedSlicesOptions = {
+  themePage: PageNode;
+  existentSlicesKeys: string[];
+  pluginDataKey: Extract<
+    PluginDataKeys,
+    PluginDataKeys.currentRadiiVariants | PluginDataKeys.currentBorderWidthVariants
+  >;
+};
+
+/**
+ * It deletes all box instances related to a slice variant
+ * if the user removed it, and returns updated refs
+ */
+export const checkAndRemoveDeletedSlices = ({
+  themePage,
+  existentSlicesKeys,
+  pluginDataKey,
+}: CheckAndRemoveDeletedSlicesOptions) => {
+  const unparsedCurrentVariants = themePage.getSharedPluginData(PLUGIN_DATA_NAMESPACE, pluginDataKey);
+  if (unparsedCurrentVariants === '') {
+    return {};
+  }
+  const currentVariants = JSON.parse(unparsedCurrentVariants) as Record<string, string>;
+
+  const updatedCurrentVariants = Object.entries(currentVariants).reduce<Record<string, string>>((acc, [name, ids]) => {
+    if (!existentSlicesKeys.includes(name)) {
+      deleteNodesById(ids.split('/#/'));
+      return acc;
+    }
+
+    return { ...acc, [name]: ids };
+  }, {});
+
+  return updatedCurrentVariants;
 };
