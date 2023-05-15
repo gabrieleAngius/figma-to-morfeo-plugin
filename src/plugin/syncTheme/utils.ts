@@ -23,16 +23,16 @@ export const syncRadiiVariants = (radiiFrame: FrameNode) => {
       return;
     }
 
-    if (refIds[0] === '') {
-      newRadiusSlices[radiiSlice.name] = cornerRadius;
-      return;
-    }
-
     if (existentRadiusSlices[radiiSlice.name]) {
       figma.notify(`The ${radiiSlice.name} variant on Radii already exist, please use a unique name`, {
         error: true,
         timeout: 2000,
       });
+      return;
+    }
+
+    if (refIds[0] === '') {
+      newRadiusSlices[radiiSlice.name] = cornerRadius;
       return;
     }
 
@@ -70,22 +70,22 @@ export const syncBorderWidthVariants = (borderWidthsFrame: FrameNode) => {
     }
 
     if (borderWidthSlice.strokeWeight === figma.mixed) {
+      figma.notify('Mixed stroke weight is not allowed on Slices', { error: true });
       return;
     }
-
     const strokeWeight = borderWidthSlice.strokeWeight;
     const refIds = borderWidthSlice.getSharedPluginData(PLUGIN_DATA_NAMESPACE, borderWidthSlice.id).split('/#/');
-
-    if (refIds[0] === '') {
-      newBorderWidthSlices[borderWidthSlice.name] = strokeWeight;
-      return;
-    }
 
     if (existentBorderWidthSlices[borderWidthSlice.name]) {
       figma.notify(`The ${borderWidthSlice.name} variant on Border widths already exist, please use a unique name`, {
         error: true,
         timeout: 2000,
       });
+      return;
+    }
+
+    if (refIds[0] === '') {
+      newBorderWidthSlices[borderWidthSlice.name] = strokeWeight;
       return;
     }
 

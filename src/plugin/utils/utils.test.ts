@@ -1,5 +1,5 @@
 import { mockGetNodeById } from '../../../__mocks__/figmaMock';
-import { mockPageNode } from '../../../__mocks__/mockUtils';
+import { mockNode } from '../../../__mocks__/mockUtils';
 import { PLUGIN_DATA_NAMESPACE, PluginDataKeys, Slices } from '../../_shared/constants';
 import {
   createInstances,
@@ -136,7 +136,7 @@ describe('deleteNodesById', () => {
 
 describe('saveCurrentBoxVariants', () => {
   it('should call setSharedPluginData with expected params', () => {
-    const themePage = mockPageNode();
+    const themePage = mockNode<PageNode>();
     const refIds = { S: '11:11/#/22:22', M: '33:33/#/44:44' };
     saveCurrentBoxVariants({ themePage, pluginKey: PluginDataKeys.currentRadiiVariants, refIds });
 
