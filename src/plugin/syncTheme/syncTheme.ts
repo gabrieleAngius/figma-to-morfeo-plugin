@@ -40,7 +40,6 @@ export const syncTheme: Controller = () => {
       error: true,
       timeout: 3000,
     });
-    figma.closePlugin();
     return;
   }
 
