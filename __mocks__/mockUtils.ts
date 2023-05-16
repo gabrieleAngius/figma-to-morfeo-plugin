@@ -4,6 +4,7 @@ export const mockNode = <T extends BaseNode>(overrides?: Partial<T>) => {
     appendChild: jest.fn(),
     setSharedPluginData: jest.fn(),
     getSharedPluginData: jest.fn(),
+    findOne: jest.fn(),
     ...overrides,
   } as unknown as T;
 };
