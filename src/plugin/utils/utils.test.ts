@@ -1,5 +1,14 @@
-import { PLUGIN_DATA_NAMESPACE, Slices } from '../../_shared/constants';
-import { createInstances, getVariantCombinations, setRefs, updateVariantName } from './utils';
+import { mockGetNodeById } from '../../../__mocks__/figmaMock';
+import { mockNode } from '../../../__mocks__/mockUtils';
+import { PLUGIN_DATA_NAMESPACE, PluginDataKeys, Slices } from '../../_shared/constants';
+import {
+  createInstances,
+  deleteNodesById,
+  getVariantCombinations,
+  saveCurrentBoxVariants,
+  setRefs,
+  updateVariantName,
+} from './utils';
 
 describe('get variant combinations', () => {
   it('should return expected combinations', () => {
@@ -105,5 +114,36 @@ describe('setRefs', () => {
 
     expect(mockSetSharedPluginData).toBeCalledTimes(1);
     expect(mockSetSharedPluginData).toBeCalledWith(PLUGIN_DATA_NAMESPACE, '123:11', '444:32/#/222:12');
+  });
+});
+
+describe('deleteNodesById', () => {
+  it('should not crash if getNodeById returns null', () => {
+    mockGetNodeById.mockReturnValue(null);
+    deleteNodesById(['11:22', '22:33']);
+  });
+  it('should call remove for each node with provided id', () => {
+    const mockRemove = jest.fn();
+    mockGetNodeById.mockReturnValue({ remove: mockRemove });
+
+    deleteNodesById(['11:22', '22:33']);
+
+    expect(mockRemove).toBeCalledTimes(2);
+    expect(mockGetNodeById).toBeCalledWith('11:22');
+    expect(mockGetNodeById).toBeCalledWith('22:33');
+  });
+});
+
+describe('saveCurrentBoxVariants', () => {
+  it('should call setSharedPluginData with expected params', () => {
+    const themePage = mockNode<PageNode>();
+    const refIds = { S: '11:11/#/22:22', M: '33:33/#/44:44' };
+    saveCurrentBoxVariants({ themePage, pluginKey: PluginDataKeys.currentRadiiVariants, refIds });
+
+    expect(themePage.setSharedPluginData).toBeCalledWith(
+      PLUGIN_DATA_NAMESPACE,
+      PluginDataKeys.currentRadiiVariants,
+      JSON.stringify(refIds)
+    );
   });
 });

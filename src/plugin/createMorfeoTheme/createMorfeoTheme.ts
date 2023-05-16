@@ -7,7 +7,7 @@ import {
 } from '../../_shared/constants';
 import { Controller } from '../../_shared/types/contoller';
 import { createBorderWidthSlices, createRadiiSlices } from '../generateTheme/utils';
-import { getNewFrame, getVariantCombinations, createInstances, setRefs } from '../utils/utils';
+import { getNewFrame, getVariantCombinations, createInstances, setRefs, saveCurrentBoxVariants } from '../utils/utils';
 
 export const createMorfeoTheme: Controller = () => {
   const themePage = figma.root.children.find((node) => node.name === THEME_PAGE_NAME);
@@ -46,6 +46,16 @@ export const createMorfeoTheme: Controller = () => {
   // set the ref ids
   setRefs({ refIds: boxVariants.refIds[Slices.Radius], slices: radiiSlices });
   setRefs({ refIds: boxVariants.refIds[Slices.BorderWidth], slices: borderWidthSlices });
+  saveCurrentBoxVariants({
+    themePage: page,
+    refIds: boxVariants.refIds[Slices.Radius],
+    pluginKey: PluginDataKeys.currentRadiiVariants,
+  });
+  saveCurrentBoxVariants({
+    themePage: page,
+    refIds: boxVariants.refIds[Slices.BorderWidth],
+    pluginKey: PluginDataKeys.currentBorderWidthVariants,
+  });
 
   box.resize(140, 140);
   boxComponent.clipsContent = false;

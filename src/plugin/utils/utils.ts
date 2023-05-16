@@ -1,4 +1,4 @@
-import { PLUGIN_DATA_NAMESPACE, Slices } from '../../_shared/constants';
+import { PLUGIN_DATA_NAMESPACE, PluginDataKeys, Slices } from '../../_shared/constants';
 
 export type RefIds = Partial<Record<Slices, Record<string, string>>>;
 
@@ -127,4 +127,31 @@ export const setRefs = ({
       slice.setSharedPluginData(PLUGIN_DATA_NAMESPACE, slice.id, refIds[slice.name]);
     }
   });
+};
+
+/**
+ * Call remove() for each node found with provided id.
+ *
+ * Doesn't do anything if a node with such id is not found
+ *
+ * @param ids list of ids to be removed
+ */
+export const deleteNodesById = (ids: string[]) => {
+  ids.map((id) => {
+    const node = figma.getNodeById(id);
+    if (node !== null) {
+      node.remove();
+    }
+  });
+};
+
+type SaveCurrentBoxVariantsOptions = {
+  themePage: PageNode;
+  refIds: Record<string, string>;
+  pluginKey: PluginDataKeys;
+};
+
+export const saveCurrentBoxVariants = ({ themePage, refIds, pluginKey }: SaveCurrentBoxVariantsOptions) => {
+  const currentVariants = JSON.stringify(refIds);
+  themePage.setSharedPluginData(PLUGIN_DATA_NAMESPACE, pluginKey, currentVariants);
 };

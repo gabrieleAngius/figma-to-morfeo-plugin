@@ -6,8 +6,8 @@ import {
   Slices,
 } from '../../_shared/constants';
 import { Controller } from '../../_shared/types/contoller';
-import { getVariantCombinations, createInstances, setRefs } from '../utils/utils';
-import { syncBorderWidthVariants, syncRadiiVariants } from './utils';
+import { getVariantCombinations, createInstances, setRefs, saveCurrentBoxVariants } from '../utils/utils';
+import { checkAndRemoveDeletedSlices, syncBorderWidthVariants, syncRadiiVariants } from './utils';
 
 export const syncTheme: Controller = () => {
   const themePage = figma.root.children.find((node) => node.name === THEME_PAGE_NAME);
@@ -25,6 +25,24 @@ export const syncTheme: Controller = () => {
   const borderWidthsFrame = themePage.findOne(
     (node) => node.name === SliceFrameNames.BorderWidth && node.type === 'FRAME'
   ) as FrameNode;
+
+  if (!radiiFrame || !borderWidthsFrame) {
+    figma.notify('Cannot find all the slices. If you delete some of them, please undo that change', {
+      error: true,
+      timeout: 3000,
+    });
+    figma.closePlugin();
+    return;
+  }
+
+  if (radiiFrame.children.length === 0 || borderWidthsFrame.children.length === 0) {
+    figma.notify('Detected some empty slices. Please keep at least one variant for each slice', {
+      error: true,
+      timeout: 3000,
+    });
+    return;
+  }
+
   const boxComponentId = themePage.getSharedPluginData(PLUGIN_DATA_NAMESPACE, PluginDataKeys.boxRefId);
   const boxComponent = figma.getNodeById(boxComponentId);
 
@@ -59,8 +77,32 @@ export const syncTheme: Controller = () => {
   // add the new variants to the Box component
   newBoxVariants.instances.map((newBoxVariant) => boxComponent.appendChild(newBoxVariant));
 
+  const existentRadiusSlicesKeys = Object.keys(existentRadiusSlices);
+  const updatedCurrentRadiusVariants = checkAndRemoveDeletedSlices({
+    themePage,
+    existentSlicesKeys: existentRadiusSlicesKeys,
+    pluginDataKey: PluginDataKeys.currentRadiiVariants,
+  });
+
+  const existentBorderWidthSlicesKeys = Object.keys(existentBorderWidthSlices);
+  const updatedCurrentBorderWidthVariants = checkAndRemoveDeletedSlices({
+    themePage,
+    existentSlicesKeys: existentBorderWidthSlicesKeys,
+    pluginDataKey: PluginDataKeys.currentBorderWidthVariants,
+  });
+
   setRefs({ refIds: newBoxVariants.refIds?.[Slices.Radius], slices: radiiFrame.children });
   setRefs({ refIds: newBoxVariants.refIds?.[Slices.BorderWidth], slices: borderWidthsFrame.children });
+  saveCurrentBoxVariants({
+    themePage,
+    refIds: { ...newBoxVariants.refIds?.[Slices.Radius], ...updatedCurrentRadiusVariants },
+    pluginKey: PluginDataKeys.currentRadiiVariants,
+  });
+  saveCurrentBoxVariants({
+    themePage,
+    refIds: { ...newBoxVariants.refIds?.[Slices.BorderWidth], ...updatedCurrentBorderWidthVariants },
+    pluginKey: PluginDataKeys.currentBorderWidthVariants,
+  });
 
   figma.notify('Components updated!');
 };
