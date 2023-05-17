@@ -9,7 +9,7 @@ import {
   mockRadiiCombinations,
   spyCreateInstance,
   mockSyncTheme,
-} from './__mock__';
+} from './mock';
 
 describe('syncTheme', () => {
   beforeEach(() => {
