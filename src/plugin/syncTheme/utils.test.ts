@@ -2,11 +2,32 @@ import { mockGetNodeById, mockNotify } from '../../../__mocks__/figmaMock';
 import { mockNode } from '../../../__mocks__/mockUtils';
 import { PluginDataKeys } from '../../_shared/constants';
 import * as GlobalUtils from '../utils/utils';
-import { checkAndRemoveDeletedSlices, syncBorderWidthVariants, syncRadiiVariants } from './utils';
+import {
+  ErrorMap,
+  ErrorType,
+  checkAndRemoveDeletedSlices,
+  generateAndRecordErrorMessage,
+  notifyErrorMessages,
+  syncBorderWidthVariants,
+  syncRadiiVariants,
+} from './utils';
+
+const errorMap: ErrorMap = {
+  [ErrorType.WRONG_ELEMENT_TYPE]: [],
+  [ErrorType.MIXED_SLICE_VALUES]: [],
+  [ErrorType.DUPLICATED_SLICE_NAME]: [],
+};
+
+function resetErrorMap() {
+  errorMap[ErrorType.WRONG_ELEMENT_TYPE] = [];
+  errorMap[ErrorType.MIXED_SLICE_VALUES] = [];
+  errorMap[ErrorType.DUPLICATED_SLICE_NAME] = [];
+}
 
 describe('syncRadiiVariants', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetErrorMap();
   });
   it('should return existent slices and new slices', () => {
     mockGetNodeById.mockReturnValue(mockNode<ComponentNode>({ type: 'COMPONENT', name: '' }));
@@ -27,7 +48,7 @@ describe('syncRadiiVariants', () => {
       ],
     } as unknown as FrameNode;
 
-    const { existentRadiusSlices, newRadiusSlices } = syncRadiiVariants(radiiFrame);
+    const { existentRadiusSlices, newRadiusSlices } = syncRadiiVariants(radiiFrame, errorMap);
 
     expect(existentRadiusSlices).toEqual({ S: 1 });
     expect(newRadiusSlices).toEqual({ M: 2 });
@@ -44,11 +65,12 @@ describe('syncRadiiVariants', () => {
       ],
     } as unknown as FrameNode;
 
-    const { existentRadiusSlices, newRadiusSlices } = syncRadiiVariants(radiiFrame);
+    const { existentRadiusSlices, newRadiusSlices } = syncRadiiVariants(radiiFrame, errorMap);
 
     expect(existentRadiusSlices).toEqual({});
     expect(newRadiusSlices).toEqual({});
     expect(radiiFrame.children[0].getSharedPluginData).not.toBeCalled();
+    expect(errorMap[ErrorType.WRONG_ELEMENT_TYPE]).toHaveLength(1);
   });
 
   it('should notify the user if he used mixed values for corner radius', () => {
@@ -63,12 +85,11 @@ describe('syncRadiiVariants', () => {
       ],
     } as unknown as FrameNode;
 
-    const { existentRadiusSlices, newRadiusSlices } = syncRadiiVariants(radiiFrame);
+    const { existentRadiusSlices, newRadiusSlices } = syncRadiiVariants(radiiFrame, errorMap);
 
     expect(existentRadiusSlices).toEqual({});
     expect(newRadiusSlices).toEqual({});
-    expect(mockNotify).toBeCalledTimes(1);
-    expect(mockNotify).toBeCalledWith('Mixed border radius is not allowed on Slices', { error: true });
+    expect(errorMap[ErrorType.MIXED_SLICE_VALUES]).toHaveLength(1);
   });
 
   it('should notify the user if there are two slices with the same name', () => {
@@ -90,21 +111,18 @@ describe('syncRadiiVariants', () => {
       ],
     } as unknown as FrameNode;
 
-    const { existentRadiusSlices, newRadiusSlices } = syncRadiiVariants(radiiFrame);
+    const { existentRadiusSlices, newRadiusSlices } = syncRadiiVariants(radiiFrame, errorMap);
 
     expect(existentRadiusSlices).toEqual({ S: 1 });
     expect(newRadiusSlices).toEqual({});
-    expect(mockNotify).toBeCalledTimes(1);
-    expect(mockNotify).toBeCalledWith('The S variant on Radii already exist, please use a unique name', {
-      error: true,
-      timeout: 2000,
-    });
+    expect(errorMap[ErrorType.DUPLICATED_SLICE_NAME]).toHaveLength(1);
   });
 });
 
 describe('syncBorderWidthVariants', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetErrorMap();
   });
   it('should return existent slices and new slices', () => {
     mockGetNodeById.mockReturnValue(mockNode<ComponentNode>({ type: 'COMPONENT', name: '' }));
@@ -125,7 +143,7 @@ describe('syncBorderWidthVariants', () => {
       ],
     } as unknown as FrameNode;
 
-    const { existentBorderWidthSlices, newBorderWidthSlices } = syncBorderWidthVariants(borderWidthFrame);
+    const { existentBorderWidthSlices, newBorderWidthSlices } = syncBorderWidthVariants(borderWidthFrame, errorMap);
 
     expect(existentBorderWidthSlices).toEqual({ S: 1 });
     expect(newBorderWidthSlices).toEqual({ M: 2 });
@@ -142,11 +160,12 @@ describe('syncBorderWidthVariants', () => {
       ],
     } as unknown as FrameNode;
 
-    const { existentBorderWidthSlices, newBorderWidthSlices } = syncBorderWidthVariants(borderWidthFrame);
+    const { existentBorderWidthSlices, newBorderWidthSlices } = syncBorderWidthVariants(borderWidthFrame, errorMap);
 
     expect(existentBorderWidthSlices).toEqual({});
     expect(newBorderWidthSlices).toEqual({});
     expect(borderWidthFrame.children[0].getSharedPluginData).not.toBeCalled();
+    expect(errorMap[ErrorType.WRONG_ELEMENT_TYPE]).toHaveLength(1);
   });
 
   it('should notify the user if he used mixed values for stroke weight', () => {
@@ -161,12 +180,11 @@ describe('syncBorderWidthVariants', () => {
       ],
     } as unknown as FrameNode;
 
-    const { existentBorderWidthSlices, newBorderWidthSlices } = syncBorderWidthVariants(borderWidthFrame);
+    const { existentBorderWidthSlices, newBorderWidthSlices } = syncBorderWidthVariants(borderWidthFrame, errorMap);
 
     expect(existentBorderWidthSlices).toEqual({});
     expect(newBorderWidthSlices).toEqual({});
-    expect(mockNotify).toBeCalledTimes(1);
-    expect(mockNotify).toBeCalledWith('Mixed stroke weight is not allowed on Slices', { error: true });
+    expect(errorMap[ErrorType.MIXED_SLICE_VALUES]).toHaveLength(1);
   });
 
   it('should notify the user if there are two slices with the same name', () => {
@@ -188,15 +206,11 @@ describe('syncBorderWidthVariants', () => {
       ],
     } as unknown as FrameNode;
 
-    const { existentBorderWidthSlices, newBorderWidthSlices } = syncBorderWidthVariants(borderWidthFrame);
+    const { existentBorderWidthSlices, newBorderWidthSlices } = syncBorderWidthVariants(borderWidthFrame, errorMap);
 
     expect(existentBorderWidthSlices).toEqual({ S: 1 });
     expect(newBorderWidthSlices).toEqual({});
-    expect(mockNotify).toBeCalledTimes(1);
-    expect(mockNotify).toBeCalledWith('The S variant on Border widths already exist, please use a unique name', {
-      error: true,
-      timeout: 2000,
-    });
+    expect(errorMap[ErrorType.DUPLICATED_SLICE_NAME]).toHaveLength(1);
   });
 });
 
@@ -206,6 +220,7 @@ jest.spyOn(GlobalUtils, 'deleteNodesById').mockImplementation(mockDeleteNodesByI
 describe('checkAndRemoveDeletedSlices', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetErrorMap();
   });
   it('should call deleteNodesById and set updated variants if detect any deleted slices', () => {
     const themePage = mockNode<PageNode>({
@@ -235,5 +250,45 @@ describe('checkAndRemoveDeletedSlices', () => {
 
     expect(updatedSliceRef).toEqual({});
     expect(mockDeleteNodesById).not.toBeCalled();
+  });
+});
+
+describe('notifyErrorMessages', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    resetErrorMap();
+  });
+
+  test('should notify the user if there are any errors', () => {
+    const currentErrorMap: ErrorMap = {
+      [ErrorType.DUPLICATED_SLICE_NAME]: ['anyError'],
+      [ErrorType.MIXED_SLICE_VALUES]: ['anyError'],
+      [ErrorType.WRONG_ELEMENT_TYPE]: ['anyError'],
+    };
+
+    notifyErrorMessages(currentErrorMap);
+
+    expect(mockNotify).toBeCalledTimes(
+      [
+        ...currentErrorMap[ErrorType.DUPLICATED_SLICE_NAME],
+        ...currentErrorMap[ErrorType.MIXED_SLICE_VALUES],
+        ...currentErrorMap[ErrorType.WRONG_ELEMENT_TYPE],
+      ].length
+    );
+  });
+
+  test('generateAndNotifyErrorMessage should create and add a new error message to the error map', () => {
+    generateAndRecordErrorMessage({
+      errorMap,
+      errorType: ErrorType.DUPLICATED_SLICE_NAME,
+      values: { sliceName: 'anySliceName', variantName: 'anyVariantName' },
+    });
+
+    expect(errorMap[ErrorType.DUPLICATED_SLICE_NAME]).toHaveLength(1);
+  });
+
+  test('should not notify the user if there are no errors', () => {
+    notifyErrorMessages(errorMap);
+    expect(mockNotify).not.toBeCalled();
   });
 });
