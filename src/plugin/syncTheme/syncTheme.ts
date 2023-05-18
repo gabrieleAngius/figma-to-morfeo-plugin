@@ -7,9 +7,22 @@ import {
 } from '../../_shared/constants';
 import { Controller } from '../../_shared/types/contoller';
 import { getVariantCombinations, createInstances, setRefs, saveCurrentBoxVariants } from '../utils/utils';
-import { checkAndRemoveDeletedSlices, syncBorderWidthVariants, syncRadiiVariants } from './utils';
+import {
+  ErrorMap,
+  ErrorType,
+  checkAndRemoveDeletedSlices,
+  notifyErrorMessages,
+  syncBorderWidthVariants,
+  syncRadiiVariants,
+} from './utils';
 
 export const syncTheme: Controller = () => {
+  const errorMap: ErrorMap = {
+    [ErrorType.WRONG_ELEMENT_TYPE]: [],
+    [ErrorType.MIXED_SLICE_VALUES]: [],
+    [ErrorType.DUPLICATED_SLICE_NAME]: [],
+  };
+
   const themePage = figma.root.children.find((node) => node.name === THEME_PAGE_NAME);
   if (!themePage) {
     figma.notify(
@@ -51,8 +64,8 @@ export const syncTheme: Controller = () => {
     return;
   }
 
-  const { existentRadiusSlices, newRadiusSlices } = syncRadiiVariants(radiiFrame);
-  const { existentBorderWidthSlices, newBorderWidthSlices } = syncBorderWidthVariants(borderWidthsFrame);
+  const { existentRadiusSlices, newRadiusSlices } = syncRadiiVariants(radiiFrame, errorMap);
+  const { existentBorderWidthSlices, newBorderWidthSlices } = syncBorderWidthVariants(borderWidthsFrame, errorMap);
 
   const newRadiiCombinations = getVariantCombinations([
     { sliceName: Slices.Radius, styleKey: 'cornerRadius', variants: newRadiusSlices },
@@ -103,6 +116,5 @@ export const syncTheme: Controller = () => {
     refIds: { ...newBoxVariants.refIds?.[Slices.BorderWidth], ...updatedCurrentBorderWidthVariants },
     pluginKey: PluginDataKeys.currentBorderWidthVariants,
   });
-
-  figma.notify('Components updated!');
+  notifyErrorMessages(errorMap);
 };

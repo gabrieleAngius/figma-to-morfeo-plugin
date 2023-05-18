@@ -87,4 +87,12 @@ describe('syncTheme', () => {
 
     expect(mockAppendChild).toBeCalledTimes([...mockRadiiCombinations, ...mockBorderWidthCombinations].length);
   });
+  test('Should call appendChild for each new variants created', () => {
+    mockRootChildren.push({
+      ...mockDefaultPage,
+    });
+    syncTheme({ type: ActionTypes.syncTheme });
+
+    expect(mockAppendChild).toBeCalledTimes([...mockRadiiCombinations, ...mockBorderWidthCombinations].length);
+  });
 });
