@@ -195,7 +195,6 @@ export type ErrorMap = Record<ErrorType, string[]>;
  * @param errorMap - Object containing the error types and their messages
  */
 export const notifyErrorMessages = (errorMap: ErrorMap) => {
-  console.log(Object.values(errorMap));
   Object.values(errorMap)
     .flat()
     .forEach((errorMessage) => {
@@ -212,7 +211,7 @@ function createWrongElementMessage({
   currentType: string;
   sliceName: string;
 }) {
-  return `The ${sliceName} slice accepts only ${acceptedElementType} elements, you're also using ${currentType}`;
+  return `The ${sliceName} slice accepts only ${acceptedElementType} elements. Please remove ${currentType} elements`;
 }
 
 function createDuplicatedSliceNameMessage({ variantName, sliceName }: { variantName: string; sliceName: string }) {
