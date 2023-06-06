@@ -1,3 +1,5 @@
+:warning: Due to highest potentiallity of figma widget (compared to the plugin) this repo is currently abandoned. The new version (which uses the widget API) [is available here](https://github.com/VLK-STUDIO/figma-to-morfeo). Feel free to join the discussions and contribute.
+
 # Figma to Morfeo
 
 [![codecov](https://codecov.io/gh/gabrieleAngius/figma-to-morfeo/branch/main/graph/badge.svg?token=VJMHSKVPCD)](https://codecov.io/gh/gabrieleAngius/figma-to-morfeo)
